@@ -1,0 +1,46 @@
+import logging
+from telegram.ext import Updater, CommandHandler
+
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+# Define a function to handle the /start command
+def start(update, context):
+    update.message.reply_text('Hello! Use /set <seconds> to set a timer')
+
+# Define a function to handle the /set command
+def alarm(update, context):
+    user = update.message.from_user
+    text = update.message.text.split(" ")
+    # check if user input is valid
+    if len(text) == 2 and text[1].isnumeric():
+        # set the timer
+        seconds = int(text[1])
+        update.message.reply_text('Timer set for {} seconds!'.format(seconds))
+    else:
+        update.message.reply_text('Invalid input. Use /set <seconds>')
+
+def main():
+    # Create an Updater object
+    updater = Updater("YOUR_TELEGRAM_BOT_TOKEN", use_context=True)
+
+    # Get the dispatcher to register handlers
+    dp = updater.dispatcher
+
+    # Add the handlers for the /start and /set commands
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("set", alarm))
+
+    # Start the bot
+    updater.start_polling()
+
+    # Run the bot until you press Ctrl-C or the process receives SIGINT,
+    # SIGTERM or SIGABRT. This should be used most of the time, since
+    # start_polling() is non-blocking and will stop the bot gracefully.
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
